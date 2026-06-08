@@ -786,7 +786,7 @@ with st.container(border=True):
 
     transcription_mode = st.radio(
         "Select Transcription Output Format",
-        ["English", "Hindi", "Hinglish"],
+        ["English", "Hindi", "Romanized Hindi"],
         horizontal=True,
         help=(
             "English translates the call into English. "
