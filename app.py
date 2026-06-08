@@ -703,6 +703,41 @@ def estimate_speakers(transcript):
         "user_turns": user_turns,
         "method": "Keyword-based conversational turn estimation"
     }
+
+def segment_bot_vendor_conversation(transcript):
+    sentences = split_into_sentences(transcript)
+
+    bot_markers = [
+        "justdial", "verification", "verify", "confirm",
+        "please confirm", "may i know", "can you confirm",
+        "business name", "company name", "mobile number",
+        "address", "working hours", "timings"
+    ]
+
+    vendor_markers = [
+        "haan", "nahi", "yes", "no", "correct", "sahi",
+        "mera", "humara", "already", "busy", "baad mein",
+        "samajh nahi", "not interested", "kyu", "why"
+    ]
+
+    segmented_turns = []
+
+    for sentence in sentences:
+        lower = sentence.lower()
+
+        if any(marker in lower for marker in bot_markers):
+            speaker = "Bot"
+        elif any(marker in lower for marker in vendor_markers):
+            speaker = "Vendor"
+        else:
+            speaker = "Unclear"
+
+        segmented_turns.append({
+            "Speaker": speaker,
+            "Dialogue": sentence
+        })
+
+    return segmented_turns
 # ---------------- UTILITY FUNCTIONS ----------------
 
 def calculate_completion(fields):
@@ -785,6 +820,7 @@ if uploaded_audio and analyze_clicked:
 
         if transcript:
             speakers = estimate_speakers(transcript)
+            speaker_segments = segment_bot_vendor_conversation(transcript)
 
             if transcription_mode == "Hinglish":
                 fields = extract_fields(transcript)
@@ -826,6 +862,7 @@ if uploaded_audio and analyze_clicked:
                 "transcription_mode": transcription_mode,
                 "fields": fields,
                 "speakers": speakers,
+                "speaker_segments": speaker_segments,
                 "bot_rating": bot_rating,
                 "bot_score": bot_score,
                 "bot_reason": bot_reason,
@@ -891,6 +928,21 @@ if "result" in st.session_state:
         st.write(f"Estimated User Turns: **{speakers['user_turns']}**")
         st.write(f"Method: {speakers['method']}")
 
+        st.markdown("### Bot / Vendor Conversation Segmentation")
+
+        speaker_segments = result.get("speaker_segments", [])
+
+        if speaker_segments:
+            st.dataframe(
+                pd.DataFrame(speaker_segments),
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            st.info(
+                "Run analysis again to generate Bot/Vendor conversation segmentation."
+            )
+
     st.divider()
 
     st.markdown("## 2. Fields Confirmed")
@@ -953,7 +1005,8 @@ if "result" in st.session_state:
         "evaluation_source": result["evaluation_source"],
         "transcription": result["transcript"],
         "fields_confirmed": result["fields"],
-        "speaker_identification": result["speakers"],
+        "speaker_identification": result.get["speakers", {}],
+        "speaker_segments": result.get("speaker_segments", []),
         "bot_quality": {
             "rating": result["bot_rating"],
             "reason": result["bot_reason"],
