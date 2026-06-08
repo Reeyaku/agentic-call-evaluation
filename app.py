@@ -1005,7 +1005,7 @@ if "result" in st.session_state:
         "evaluation_source": result["evaluation_source"],
         "transcription": result["transcript"],
         "fields_confirmed": result["fields"],
-        "speaker_identification": result.get["speakers", {}],
+        "speaker_identification": result.get("speakers", {}),
         "speaker_segments": result.get("speaker_segments", []),
         "bot_quality": {
             "rating": result["bot_rating"],
