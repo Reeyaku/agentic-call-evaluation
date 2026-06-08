@@ -863,7 +863,7 @@ if "result" in st.session_state:
 
     st.divider()
 
-        st.markdown(f"## 1. {result['transcription_mode']} Transcription")
+    st.markdown(f"## 1. {result['transcription_mode']} Transcription")
     st.text_area(
         "Generated Transcript",
         result["transcript"],
