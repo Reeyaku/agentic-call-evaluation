@@ -864,6 +864,7 @@ if "result" in st.session_state:
     st.divider()
 
     st.markdown(f"## 1. {result['transcription_mode']} Transcription")
+
     st.text_area(
         "Generated Transcript",
         result["transcript"],
@@ -871,26 +872,26 @@ if "result" in st.session_state:
     )
 
     with st.expander("Speaker Identification / Diarization Approach"):
-    st.write(
-        "This proof-of-concept uses keyword-based conversational turn estimation instead of full audio diarization."
-    )
+        st.write(
+            "This proof-of-concept uses keyword-based conversational turn estimation instead of full audio diarization."
+        )
 
-    speakers = result.get(
-        "speakers",
-        {
-            "estimated_speakers": "Not available",
-            "bot_turns": 0,
-            "user_turns": 0,
-            "method": "Run analysis again to generate speaker identification."
-        }
-    )
+        speakers = result.get(
+            "speakers",
+            {
+                "estimated_speakers": "Not available",
+                "bot_turns": 0,
+                "user_turns": 0,
+                "method": "Run analysis again to generate speaker identification."
+            }
+        )
 
-    st.write(f"Estimated Speakers: **{speakers['estimated_speakers']}**")
-    st.write(f"Estimated Bot Turns: **{speakers['bot_turns']}**")
-    st.write(f"Estimated User Turns: **{speakers['user_turns']}**")
-    st.write(f"Method: {speakers['method']}")
+        st.write(f"Estimated Speakers: **{speakers['estimated_speakers']}**")
+        st.write(f"Estimated Bot Turns: **{speakers['bot_turns']}**")
+        st.write(f"Estimated User Turns: **{speakers['user_turns']}**")
+        st.write(f"Method: {speakers['method']}")
 
-st.divider()
+    st.divider()
 
     st.markdown("## 2. Fields Confirmed")
     fields_df = pd.DataFrame(result["fields"])
