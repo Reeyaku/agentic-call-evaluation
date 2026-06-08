@@ -791,12 +791,12 @@ with st.container(border=True):
         help=(
             "English translates the call into English. "
             "Hindi gives Devanagari Hindi script. "
-            "Hinglish gives Hindi written using English letters."
+            "Romanized Hindi gives Hindi written using English letters."
         )
     )
 
     st.caption(
-        "English = English transcript | Hindi = हिंदी लिपि | Hinglish = Roman Hindi source-style transcript"
+        "English = English transcript | Hindi = हिंदी लिपि | Romanized Hindi = Hindi speech written in English characters"
     )
 
     uploaded_audio = st.file_uploader(
@@ -822,7 +822,7 @@ if uploaded_audio and analyze_clicked:
             speakers = estimate_speakers(transcript)
             speaker_segments = segment_bot_vendor_conversation(transcript)
 
-            if transcription_mode == "Hinglish":
+            if transcription_mode == "Romanized Hindi":
                 fields = extract_fields(transcript)
 
                 bot_rating, bot_score, bot_reason, bot_checks = evaluate_bot(transcript, fields)
