@@ -201,11 +201,31 @@ def clean_json_response(content):
 
     if content.startswith("```json"):
         content = content.replace("```json", "").replace("```", "").strip()
+
     elif content.startswith("```"):
         content = content.replace("```", "").strip()
 
-    return json.loads(content)
+    try:
+        return json.loads(content)
 
+    except Exception:
+
+        try:
+            start = content.find("{")
+            end = content.rfind("}")
+
+            if start != -1 and end != -1:
+                return json.loads(content[start:end + 1])
+
+        except Exception:
+            pass
+
+        st.error("Gemini returned invalid JSON")
+
+        st.write("Raw Gemini Response:")
+        st.code(content)
+
+        st.stop()
 
 def gemini_evaluate_call(transcript, transcription_mode):
     api_key = get_gemini_api_key()
