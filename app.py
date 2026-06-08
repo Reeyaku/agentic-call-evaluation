@@ -825,7 +825,7 @@ if uploaded_audio and analyze_clicked:
                 "transcript": transcript,
                 "transcription_mode": transcription_mode,
                 "fields": fields,
-                "Speakers": speakers,
+                "speakers": speakers,
                 "bot_rating": bot_rating,
                 "bot_score": bot_score,
                 "bot_reason": bot_reason,
@@ -871,13 +871,26 @@ if "result" in st.session_state:
     )
 
     with st.expander("Speaker Identification / Diarization Approach"):
-        st.write("This proof-of-concept uses keyword-based conversational turn estimation instead of full audio diarization.")
-        st.write(f"Estimated Speakers: **{result['speakers']['estimated_speakers']}**")
-        st.write(f"Estimated Bot Turns: **{result['speakers']['bot_turns']}**")
-        st.write(f"Estimated User Turns: **{result['speakers']['user_turns']}**")
-        st.write(f"Method: {result['speakers']['method']}")
+    st.write(
+        "This proof-of-concept uses keyword-based conversational turn estimation instead of full audio diarization."
+    )
 
-    st.divider()
+    speakers = result.get(
+        "speakers",
+        {
+            "estimated_speakers": "Not available",
+            "bot_turns": 0,
+            "user_turns": 0,
+            "method": "Run analysis again to generate speaker identification."
+        }
+    )
+
+    st.write(f"Estimated Speakers: **{speakers['estimated_speakers']}**")
+    st.write(f"Estimated Bot Turns: **{speakers['bot_turns']}**")
+    st.write(f"Estimated User Turns: **{speakers['user_turns']}**")
+    st.write(f"Method: {speakers['method']}")
+
+st.divider()
 
     st.markdown("## 2. Fields Confirmed")
     fields_df = pd.DataFrame(result["fields"])
