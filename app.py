@@ -145,7 +145,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         temp_audio_path = temp_audio.name
 
     if transcription_mode == "English":
-        model_size = "medium"
+        model_size = "base"
         language = None
         task = "translate"
         prompt = (
@@ -155,7 +155,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     elif transcription_mode == "Hindi":
-        model_size = "medium"
+        model_size = "base"
         language = "hi"
         task = "transcribe"
         prompt = (
@@ -164,7 +164,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     else:
-        model_size = "medium"
+        model_size = "base"
         language = "hi"
         task = "transcribe"
         prompt = (
