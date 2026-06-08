@@ -659,7 +659,50 @@ The user was rated **{user_rating}** based on cooperation, response clarity, rel
 **Missing Fields:** {", ".join(missing) if missing else "None"}
 """
 
+#speaker identification
+def estimate_speakers(transcript):
+    sentences = split_into_sentences(transcript)
 
+    bot_keywords = [
+        "verify", "verification", "confirm", "justdial",
+        "business information", "may i know", "can you",
+        "please confirm", "working hours", "mobile number",
+        "company name", "address"
+    ]
+
+    user_keywords = [
+        "haan", "nahi", "yes", "no", "correct", "sahi",
+        "busy", "later", "call later", "already", "why",
+        "samajh nahi", "not interested"
+    ]
+
+    bot_turns = 0
+    user_turns = 0
+
+    for sentence in sentences:
+        lower = sentence.lower()
+
+        if any(word in lower for word in bot_keywords):
+            bot_turns += 1
+        elif any(word in lower for word in user_keywords):
+            user_turns += 1
+
+    total_detected = bot_turns + user_turns
+
+    if total_detected == 0:
+        return {
+            "estimated_speakers": "Not clearly identifiable",
+            "bot_turns": 0,
+            "user_turns": 0,
+            "method": "Keyword-based conversational turn estimation"
+        }
+
+    return {
+        "estimated_speakers": "Bot and User",
+        "bot_turns": bot_turns,
+        "user_turns": user_turns,
+        "method": "Keyword-based conversational turn estimation"
+    }
 # ---------------- UTILITY FUNCTIONS ----------------
 
 def calculate_completion(fields):
@@ -741,6 +784,7 @@ if uploaded_audio and analyze_clicked:
         transcript = transcribe_audio(uploaded_audio, transcription_mode)
 
         if transcript:
+            speakers = estimate_speakers(transcript)
 
             if transcription_mode == "Hinglish":
                 fields = extract_fields(transcript)
@@ -781,6 +825,7 @@ if uploaded_audio and analyze_clicked:
                 "transcript": transcript,
                 "transcription_mode": transcription_mode,
                 "fields": fields,
+                "Speakers": speakers,
                 "bot_rating": bot_rating,
                 "bot_score": bot_score,
                 "bot_reason": bot_reason,
@@ -818,12 +863,19 @@ if "result" in st.session_state:
 
     st.divider()
 
-    st.markdown(f"## 1. {result['transcription_mode']} Transcription")
+        st.markdown(f"## 1. {result['transcription_mode']} Transcription")
     st.text_area(
         "Generated Transcript",
         result["transcript"],
         height=220
     )
+
+    with st.expander("Speaker Identification / Diarization Approach"):
+        st.write("This proof-of-concept uses keyword-based conversational turn estimation instead of full audio diarization.")
+        st.write(f"Estimated Speakers: **{result['speakers']['estimated_speakers']}**")
+        st.write(f"Estimated Bot Turns: **{result['speakers']['bot_turns']}**")
+        st.write(f"Estimated User Turns: **{result['speakers']['user_turns']}**")
+        st.write(f"Method: {result['speakers']['method']}")
 
     st.divider()
 
@@ -887,6 +939,7 @@ if "result" in st.session_state:
         "evaluation_source": result["evaluation_source"],
         "transcription": result["transcript"],
         "fields_confirmed": result["fields"],
+        "speaker_identification": result["speakers"],
         "bot_quality": {
             "rating": result["bot_rating"],
             "reason": result["bot_reason"],
