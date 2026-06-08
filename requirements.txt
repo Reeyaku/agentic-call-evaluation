@@ -1,0 +1,8 @@
+streamlit
+openai-whisper
+torch
+pandas
+numpy
+textblob
+regex
+google-genai
