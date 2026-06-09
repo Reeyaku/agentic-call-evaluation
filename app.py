@@ -145,7 +145,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         temp_audio_path = temp_audio.name
 
     if transcription_mode == "English":
-        model_size = "base"
+        model_size = "medium"
         language = None
         task = "translate"
         prompt = (
@@ -155,7 +155,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     elif transcription_mode == "Hindi":
-        model_size = "base"
+        model_size = "medium"
         language = "hi"
         task = "transcribe"
         prompt = (
@@ -164,7 +164,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     else:
-        model_size = "base"
+        model_size = "medium"
         language = "hi"
         task = "transcribe"
         prompt = (
@@ -639,7 +639,7 @@ def call_status(fields):
     elif confirmed + partial >= 2:
         return "Partially Successful"
     else:
-        return "Failed / Follow-up Required"
+        return "Follow-up Required"
 
 
 def create_summary(status, bot_rating, user_rating, fields):
@@ -763,8 +763,10 @@ def status_style(val):
 def display_status_badge(status):
     if status == "Successful":
         st.markdown(f'<span class="badge-success">{status}</span>', unsafe_allow_html=True)
-    elif status == "Partially Successful":
+
+    elif status in ["Partially Successful", "Follow-up Required"]:
         st.markdown(f'<span class="badge-warning">{status}</span>', unsafe_allow_html=True)
+
     else:
         st.markdown(f'<span class="badge-danger">{status}</span>', unsafe_allow_html=True)
 
@@ -887,7 +889,7 @@ if "result" in st.session_state:
 
     col1, col2, col3, col4 = st.columns(4)
 
-    col1.metric("Call Status", result["status"])
+    col1.metric("Verification Outcome", result["status"])
     col2.metric("Fields Confirmed", f"{result['confirmed_count']}/4")
     col3.metric("Data Completion", f"{result['completion']}%")
     col4.metric(
@@ -898,8 +900,27 @@ if "result" in st.session_state:
     st.progress(result["completion"] / 100)
     display_status_badge(result["status"])
 
-    st.divider()
+    with st.expander("What does the verification outcome mean?"):
+        st.write("Successful: All required business fields were clearly confirmed.")
+        st.write("Partially Successful: Some fields were confirmed, while others require follow-up.")
+        st.write("Follow-up Required: The call was analyzed successfully, but insufficient business information was confirmed.")
 
+    if result["status"] == "Follow-up Required":
+        st.warning(
+            "Analysis completed successfully. However, the call did not contain enough clearly confirmed business details. A follow-up call may be required."
+        )
+
+    elif result["status"] == "Partially Successful":
+        st.info(
+            "Analysis completed successfully. Some business details were verified, while others may require follow-up."
+        )
+
+    elif result["status"] == "Successful":
+        st.success(
+            "Analysis completed successfully and all required business details were verified."
+        )
+
+    st.divider()
     st.markdown(f"## 1. {result['transcription_mode']} Transcription")
 
     st.text_area(
@@ -945,8 +966,11 @@ if "result" in st.session_state:
 
     st.divider()
 
-    st.markdown("## 2. Fields Confirmed")
+    st.markdown("## 2. Business Fields Verification")
     fields_df = pd.DataFrame(result["fields"])
+        st.caption(
+    "A field is marked as Confirmed only when the vendor clearly provides or confirms the information during the call."
+)
 
     st.dataframe(
         fields_df.style.applymap(status_style, subset=["Status"]),
