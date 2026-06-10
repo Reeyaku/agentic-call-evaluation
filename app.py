@@ -967,10 +967,12 @@ if "result" in st.session_state:
     st.divider()
 
     st.markdown("## 2. Business Fields Verification")
+
     fields_df = pd.DataFrame(result["fields"])
+
     st.caption(
-    "A field is marked as Confirmed only when the vendor clearly provides or confirms the information during the call."
-)
+        "A field is marked as Confirmed only when the vendor clearly provides or confirms the information during the call."
+    )
 
     st.dataframe(
         fields_df.style.applymap(status_style, subset=["Status"]),
