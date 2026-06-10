@@ -145,7 +145,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         temp_audio_path = temp_audio.name
 
     if transcription_mode == "English":
-        model_size = "medium"
+        model_size = "base"
         language = None
         task = "translate"
         prompt = (
@@ -155,7 +155,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     elif transcription_mode == "Hindi":
-        model_size = "medium"
+        model_size = "base"
         language = "hi"
         task = "transcribe"
         prompt = (
@@ -164,7 +164,7 @@ def transcribe_audio(uploaded_file, transcription_mode):
         )
 
     else:
-        model_size = "medium"
+        model_size = "base"
         language = "hi"
         task = "transcribe"
         prompt = (
@@ -850,6 +850,8 @@ if uploaded_audio and analyze_clicked:
                 user_checks = ai_result["user_quality"]["parameters"]
 
                 status = ai_result["overall_call_status"]
+                if "Failed" in status:
+                    status = "Follow-up Required"
                 summary = ai_result["summary"]
 
                 bot_score = 0
@@ -890,7 +892,7 @@ if "result" in st.session_state:
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric("Verification Outcome", result["status"])
-    col2.metric("Fields Confirmed", f"{result['confirmed_count']}/4")
+    col2.metric("Business Fields Verified", f"{result['confirmed_count']}/4")
     col3.metric("Data Completion", f"{result['completion']}%")
     col4.metric(
         "Evaluation Source",
