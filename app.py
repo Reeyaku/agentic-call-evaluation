@@ -968,7 +968,7 @@ if "result" in st.session_state:
 
     st.markdown("## 2. Business Fields Verification")
     fields_df = pd.DataFrame(result["fields"])
-        st.caption(
+    st.caption(
     "A field is marked as Confirmed only when the vendor clearly provides or confirms the information during the call."
 )
 
